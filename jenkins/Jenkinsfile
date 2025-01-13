@@ -1,48 +1,45 @@
 pipeline {
     agent any
-//    node {
-        stages {
-            // stage('Checkout') {
-            //     steps {
-            //         git branch: 'main', url: 'https://github.com/stevegregev/matrix-exercise.git'
-            //     }
-            // }
-            
-            stage('Build and push') {
-                steps {
-                    dir ("jenkins") {
-                        script {
-                            def build = docker.build("steveregev/$JOB_BASE_NAME:$BUILD_NUMBER", "--build-arg prod_name=$JOB_BASE_NAME --build-arg build_num=$BUILD_NUMBER -t steveregev/$JOB_BASE_NAME:$BUILD_NUMBER .")
-                            docker.withRegistry('', 'docker_login') {
-                                build.push()
-                                build.push('latest')
-                            }
-                        }
-                    }
-                }
-            }
 
-            stage('Update deployment') {
-                steps {
-                    dir ("k8s") {
-                        script {
-                            editYaml('Deployment.yaml') { yaml ->
-                                yaml.spec.template.spec.containers[0].image = "steveregev/$JOB_BASE_NAME:$BUILD_NUMBER"
-                            }
-                            withCredentials([gitUsernamePassword(credentialsId: 'github_user_pass', gitToolName: 'Default')]) {
-                                sh '''
-                                    git add Deployment.yaml
-                                    git commit -m "Update image tag to $BUILD_NUMBER"
-                                    git push origin HEAD:main
+    environment {
+        GITHUB_USER = 'stevegregev'
+    }
 
-                                '''
-                            }
+    stages {
+        stage('Build and push') {
+            steps {
+                dir ("jenkins") {
+                    script {
+                        def build = docker.build("$GITHUB_USER/$JOB_BASE_NAME:$BUILD_NUMBER", "--build-arg prod_name=$JOB_BASE_NAME --build-arg build_num=$BUILD_NUMBER -t $GITHUB_USER/$JOB_BASE_NAME:$BUILD_NUMBER .")
+                        docker.withRegistry('', 'docker_login') {
+                            build.push()
+                            build.push('latest')
                         }
                     }
                 }
             }
         }
-//    }
+
+        stage('Update deployment') {
+            steps {
+                dir ("k8s") {
+                    script {
+                        editYaml('Deployment.yaml') { yaml ->
+                            yaml.spec.template.spec.containers[0].image = "$GITHUB_USER/$JOB_BASE_NAME:$BUILD_NUMBER"
+                        }
+                        withCredentials([gitUsernamePassword(credentialsId: 'github_user_pass', gitToolName: 'Default')]) {
+                            sh '''
+                                git add Deployment.yaml
+                                git commit -m "Update image tag to $BUILD_NUMBER"
+                                git push origin HEAD:main
+
+                            '''
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
 def editYaml (path, Closure cl) {
