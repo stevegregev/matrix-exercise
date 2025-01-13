@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        GITHUB_USER = 'stevegregev'
+        DOCKERHUB_USER = 'steveregev'
     }
 
     stages {
@@ -10,7 +10,7 @@ pipeline {
             steps {
                 dir ("jenkins") {
                     script {
-                        def build = docker.build("$GITHUB_USER/$JOB_BASE_NAME:$BUILD_NUMBER", "--build-arg prod_name=$JOB_BASE_NAME --build-arg build_num=$BUILD_NUMBER -t $GITHUB_USER/$JOB_BASE_NAME:$BUILD_NUMBER .")
+                        def build = docker.build("$DOCKERHUB_USER/$JOB_BASE_NAME:$BUILD_NUMBER", "--build-arg prod_name=$JOB_BASE_NAME --build-arg build_num=$BUILD_NUMBER -t $DOCKERHUB_USER/$JOB_BASE_NAME:$BUILD_NUMBER .")
                         docker.withRegistry('', 'docker_login') {
                             build.push()
                             build.push('latest')
@@ -25,7 +25,7 @@ pipeline {
                 dir ("k8s") {
                     script {
                         editYaml('Deployment.yaml') { yaml ->
-                            yaml.spec.template.spec.containers[0].image = "$GITHUB_USER/$JOB_BASE_NAME:$BUILD_NUMBER"
+                            yaml.spec.template.spec.containers[0].image = "$DOCKERHUB_USER/$JOB_BASE_NAME:$BUILD_NUMBER"
                         }
                         withCredentials([gitUsernamePassword(credentialsId: 'github_user_pass', gitToolName: 'Default')]) {
                             sh '''
