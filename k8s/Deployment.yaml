@@ -14,6 +14,6 @@ spec:
     spec:
       containers:
       - name: matrix-exercise
-        image: steveregev/matrix-exercise:14
+        image: steveregev/matrix-exercise:15
         ports:
         - containerPort: 80
