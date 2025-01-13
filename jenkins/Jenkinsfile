@@ -12,7 +12,7 @@ pipeline {
                 steps {
                     dir ("jenkins") {
                         script {
-                            def build = docker.build("steveregev/demo/$JOB_BASE_NAME:$BUILD_NUMBER", "--build-arg prod_name=$JOB_BASE_NAME --build-arg build_num=$BUILD_NUMBER -t steveregev/demo/$JOB_BASE_NAME:$BUILD_NUMBER .")
+                            def build = docker.build("steveregev/$JOB_BASE_NAME:$BUILD_NUMBER", "--build-arg prod_name=$JOB_BASE_NAME --build-arg build_num=$BUILD_NUMBER -t steveregev/$JOB_BASE_NAME:$BUILD_NUMBER .")
                             docker.withRegistry('', 'docker_login') {
                                 build.push()
                                 build.push('latest')
