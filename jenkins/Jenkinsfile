@@ -1,0 +1,22 @@
+pipeline {
+    agent any
+//    node {
+        stages {
+            stage('Checkout') {
+                steps {
+                    git branch: 'main', url: 'https://github.com/stevegregev/matrix-exercise.git'
+                }
+            }
+            
+            stage('Build') {
+                steps {
+                    dir ("jenkins") {
+                        script {
+                            def build = docker.build("$JOB_BASE_NAME:$BUILD_NUMBER", "--build-arg build_num=$BUILD_NUMBER -t $JOB_BASE_NAME:$BUILD_NUMBER .")
+                        }
+                    }
+                }
+            }
+        }
+//    }
+}
