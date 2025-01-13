@@ -2,11 +2,11 @@ pipeline {
     agent any
 //    node {
         stages {
-            stage('Checkout') {
-                steps {
-                    git branch: 'main', url: 'https://github.com/stevegregev/matrix-exercise.git'
-                }
-            }
+            // stage('Checkout') {
+            //     steps {
+            //         git branch: 'main', url: 'https://github.com/stevegregev/matrix-exercise.git'
+            //     }
+            // }
             
             stage('Build') {
                 steps {
