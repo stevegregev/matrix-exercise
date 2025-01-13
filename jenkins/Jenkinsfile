@@ -29,11 +29,12 @@ pipeline {
                             editYaml('Deployment.yaml') { yaml ->
                                 yaml.spec.template.spec.containers[0].image = "steveregev/$JOB_BASE_NAME:$BUILD_NUMBER"
                             }
-                            withCredentials([gitUsernamePassword(credentialsId: 'db795710-d8b8-40d8-8242-341ccbc1a036')]) {
+                            withCredentials([gitUsernamePassword(credentialsId: 'db795710-d8b8-40d8-8242-341ccbc1a036', gitToolName: 'Default')]) {
                                 sh '''
                                     git add Deployment.yaml
                                     git commit -m "Update image tag to $BUILD_NUMBER"
-                                    git push
+                                    git push origin HEAD:main
+
                                 '''
                             }
                         }
