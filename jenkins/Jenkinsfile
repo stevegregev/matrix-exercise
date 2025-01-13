@@ -21,6 +21,29 @@ pipeline {
                     }
                 }
             }
+
+            stage('Update deployment') {
+                steps {
+                    dir ("k8s") {
+                        script {
+                            editYaml('Deployment.yaml') { yaml ->
+                                yaml.spec.template.spec.containers[0].image = "steveregev/$JOB_BASE_NAME:$BUILD_NUMBER"
+                            }
+                            sh '''
+                                git add Deployment.yaml
+                                git commit -m "Update image tag to $BUILD_NUMBER"
+                                git push
+                            '''
+                        }
+                    }
+                }
+            }
         }
 //    }
+}
+
+def editYaml (path, Closure cl) {
+    def yaml = readYaml file: path
+    cl.call(yaml)
+    writeYaml file: path, data: yaml, overwrite: true
 }
