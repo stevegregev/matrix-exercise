@@ -8,7 +8,7 @@ spec:
   source:
     repoURL: https://github.com/stevegregev/matrix-exercise.git
     targetRevision: HEAD
-    path: jenkins
+    path: k8s
   destination:
     server: https://kubernetes.default.svc
     namespace: demo

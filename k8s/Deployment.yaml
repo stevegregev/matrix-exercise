@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: matrix-exercise
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: matrix-exercise
+  template:
+    metadata:
+      labels:
+        app: matrix-exercise
+    spec:
+      containers:
+      - name: matrix-exercise
+        image: steveregev/matrix-exercise:latest
+        ports:
+        - containerPort: 80
