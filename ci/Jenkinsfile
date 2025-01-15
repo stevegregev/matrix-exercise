@@ -8,7 +8,7 @@ pipeline {
     stages {
         stage('Build and push') {
             steps {
-                dir ("jenkins") {
+                dir ("ci") {
                     script {
                         def build = docker.build("$DOCKERHUB_USER/$JOB_BASE_NAME:$BUILD_NUMBER", "--build-arg prod_name=$JOB_BASE_NAME --build-arg build_num=$BUILD_NUMBER -t $DOCKERHUB_USER/$JOB_BASE_NAME:$BUILD_NUMBER .")
                         docker.withRegistry('', 'docker_login') {
@@ -22,7 +22,7 @@ pipeline {
 
         stage('Update deployment') {
             steps {
-                dir ("k8s") {
+                dir ("cd") {
                     script {
                         editYaml('Deployment.yaml') { yaml ->
                             yaml.spec.template.spec.containers[0].image = "$DOCKERHUB_USER/$JOB_BASE_NAME:$BUILD_NUMBER"
