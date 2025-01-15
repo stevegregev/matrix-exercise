@@ -5,7 +5,6 @@ pipeline {
         DOCKERHUB_USER = 'steveregev'
     }
 
-
     stages {
         stage('Build and push') {
             steps {
